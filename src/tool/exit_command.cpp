@@ -12,22 +12,22 @@ exit_command::~exit_command()
 {
 }
 
-const char * exit_command::argument_description() const
+std::vector<argument_descriptor const> const &exit_command::arguments() const
 {
-	return "";
+	return noarg;
 }
 
-const char * exit_command::description() const
+char const *exit_command::description() const
 {
 	return "exit the program";
 }
 
-bool exit_command::execute(const std::vector<std::string>& args)
+bool exit_command::execute(std::vector<std::string> const &args)
 {
 	return false;
 }
 
-const char * exit_command::name() const
+char const *exit_command::name() const
 {
 	return "exit";
 }

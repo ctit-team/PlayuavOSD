@@ -2,6 +2,7 @@
 #define PROGRAM_HPP_INCLUDED
 
 #include "command.hpp"
+#include "variable.hpp"
 
 #include <functional>
 #include <string>
@@ -13,16 +14,16 @@ class program final {
 public:
 	static program instance;
 
-	program(const program&) = delete;
+	program(program const &) = delete;
 
-	program& operator=(const program&) = delete;
+	program &operator=(program const &) = delete;
 
-	const command_table& get_commands() const;
+	command_table const &get_commands() const;
 	std::string get_usage_text() const;
-	std::string get_usage_text(const std::string& cmd, const std::string& arg_desc) const;
-	std::string get_usage_text(const std::string& cmd, const std::string& arg_desc, bool prog_name) const;
+	std::string get_usage_text(std::string const &cmd, std::string const &arg_desc) const;
+	std::string get_usage_text(std::string const &cmd, std::string const &arg_desc, bool prog_name) const;
 
-	std::string read_input(const std::string& prompt);
+	std::string read_input(std::string const &prompt);
 
 	int run(int argc, char *argv[]);
 private:
@@ -44,7 +45,8 @@ private:
 
 	int run_interactive();
 	int run_non_interactive(int argc, char *argv[]);
-	command_result execute_command(const std::string& cmd, const std::vector<std::string>& args);
+	command_result execute_command(std::string const &name, std::vector<std::string> const &args);
+	std::vector<std::string> transform_command_arguments(command const &cmd, std::vector<std::string> const &args);
 };
 
 #endif // PROGRAM_HPP_INCLUDED

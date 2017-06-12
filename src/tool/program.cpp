@@ -4,6 +4,7 @@
 #include "help_command.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include <readline/readline.h>
 
@@ -30,22 +31,26 @@ program::~program()
 {
 }
 
-program::command_result program::execute_command(const std::string& cmd, const std::vector<std::string>& args)
+program::command_result program::execute_command(std::string const &name, std::vector<std::string> const &args)
 {
 	try {
-		auto it = commands.find(cmd);
+		// locate the command to execute
+		auto it = commands.find(name);
 		if (it == commands.end()) {
 			throw std::runtime_error("command does not exists");
 		}
 
-		return it->second.get().execute(args) ? command_result::success : command_result::stop_program;
-	} catch (std::exception& e) {
-		std::cerr << "failed to execute '" << cmd << "' command: " << e.what() << std::endl;
+		auto &cmd = it->second.get();
+
+		// execute
+		return cmd.execute(transform_command_arguments(cmd, args)) ? command_result::success : command_result::stop_program;
+	} catch (std::exception &e) {
+		std::cerr << "failed to execute '" << name << "' command: " << e.what() << std::endl;
 		return command_result::error;
 	}
 }
 
-const command_table& program::get_commands() const
+command_table const &program::get_commands() const
 {
 	return commands;
 }
@@ -55,12 +60,12 @@ std::string program::get_usage_text() const
 	return name + " COMMAND [ARG]...";
 }
 
-std::string program::get_usage_text(const std::string& cmd, const std::string& arg_desc) const
+std::string program::get_usage_text(std::string const &cmd, std::string const &arg_desc) const
 {
 	return get_usage_text(cmd, arg_desc, !interactive);
 }
 
-std::string program::get_usage_text(const std::string& cmd, const std::string& arg_desc, bool prog_name) const
+std::string program::get_usage_text(std::string const &cmd, std::string const &arg_desc, bool prog_name) const
 {
 	std::string text = prog_name ? name + ' ' : "";
 
@@ -81,7 +86,7 @@ void program::initialize_command_table()
 	});
 }
 
-std::string program::read_input(const std::string& prompt)
+std::string program::read_input(std::string const &prompt)
 {
 	std::unique_ptr<char[], void (*) (void *)> line(readline(prompt.c_str()), std::free);
 
@@ -144,10 +149,10 @@ int program::run_non_interactive(int argc, char *argv[])
 {
 	// parse arguments
 	std::string cmd = argv[1];
-	std::vector<std::string> args(argc - 2);
+	std::vector<std::string> args;
 
-	std::transform(&argv[2], &argv[argc], args.begin(), [](const char *arg) {
-		return std::string(arg);
+	std::transform(&argv[2], &argv[argc], std::back_inserter(args), [](char const *arg) -> std::string {
+		return arg;
 	});
 
 	// execute command
@@ -165,4 +170,58 @@ int program::run_non_interactive(int argc, char *argv[])
 	default:
 		throw std::logic_error("the command executor return unexpected result");
 	}
+}
+
+std::vector<std::string> program::transform_command_arguments(command const &cmd, std::vector<std::string> const &args)
+{
+	// transfer arguments
+	auto current_arg = args.begin();
+	auto opt_phase = false;
+	std::vector<std::string> result;
+
+	for (auto &desc : cmd.arguments()) {
+		// check argument's order
+		if (opt_phase && desc.required) {
+			auto msg = boost::str(boost::format("the required arguments of the command '%s' must come before optionals") % cmd.name());
+			throw std::logic_error(msg);
+		}
+
+		if (!desc.required) {
+			opt_phase = true;
+		}
+
+		// load variable
+		if (desc.variable) {
+			if (!desc.required) {
+				auto msg = boost::format("the argument '%s' for the command '%s' is a variable but it's not required") % desc.name % cmd.name();
+				throw std::logic_error(boost::str(msg));
+			}
+
+			if (!vars::all.count(desc.name)) {
+				auto msg = boost::format("the argument '%s' for the command '%s' is not a valid variable") % desc.name % cmd.name();
+				throw std::logic_error(boost::str(msg));
+			}
+
+			auto it = variables_value.find(desc.name);
+			if (it != variables_value.end()) {
+				result.push_back(it->second);
+				continue;
+			}
+		}
+
+		// use value that user supplied
+		if (current_arg == args.end()) {
+			if (opt_phase) break;
+			throw std::runtime_error("insufficient arguments");
+		}
+
+		result.push_back(*current_arg);
+		current_arg++;
+	}
+
+	if (current_arg != args.end()) {
+		throw std::runtime_error("too many arguments");
+	}
+
+	return result;
 }

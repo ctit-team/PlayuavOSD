@@ -9,18 +9,19 @@ class help_command final : public command {
 public:
 	static help_command instance;
 
-	const char * name() const override;
-	const char * argument_description() const override;
-	const char * description() const override;
+	char const *name() const override;
+	std::vector<argument_descriptor const> const &arguments() const override;
+	char const *description() const override;
+
 	void show_help() const override;
 
-	bool execute(const std::vector<std::string>& args) override;
+	bool execute(std::vector<std::string> const &args) override;
 private:
 	help_command();
 	~help_command();
 
 	void print_commands();
-	bool print_command_help(const std::string& name);
+	bool print_command_help(std::string const &name);
 };
 
 #endif // HELP_COMMAND_HPP_INCLUDED

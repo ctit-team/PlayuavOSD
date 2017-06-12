@@ -7,12 +7,13 @@ class exit_command final : public command {
 public:
 	static exit_command instance;
 
-	const char * name() const override;
-	const char * argument_description() const override;
-	const char * description() const override;
+	char const *name() const override;
+	std::vector<argument_descriptor const> const &arguments() const override;
+	char const *description() const override;
+
 	void show_help() const override;
 
-	bool execute(const std::vector<std::string>& args) override;
+	bool execute(std::vector<std::string> const &args) override;
 private:
 	exit_command();
 	~exit_command();

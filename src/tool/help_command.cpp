@@ -1,9 +1,14 @@
 #include "help_command.hpp"
+
 #include "program.hpp"
 
 #include <boost/format.hpp>
 
 #include <iostream>
+
+std::vector<argument_descriptor const> const args_desc = {
+	argument_descriptor{ .name = "COMMAND" }
+};
 
 help_command help_command::instance;
 
@@ -15,17 +20,17 @@ help_command::~help_command()
 {
 }
 
-const char * help_command::argument_description() const
+std::vector<argument_descriptor const> const &help_command::arguments() const
 {
-	return "[COMMAND]";
+	return args_desc;
 }
 
-const char * help_command::description() const
+char const *help_command::description() const
 {
 	return "show help message for the command(s)";
 }
 
-bool help_command::execute(const std::vector<std::string>& args)
+bool help_command::execute(std::vector<std::string> const &args)
 {
 	switch (args.size()) {
 	case 0:
@@ -43,14 +48,14 @@ bool help_command::execute(const std::vector<std::string>& args)
 	return true;
 }
 
-const char * help_command::name() const
+char const *help_command::name() const
 {
 	return "help";
 }
 
-bool help_command::print_command_help(const std::string& name)
+bool help_command::print_command_help(std::string const &name)
 {
-	auto& commands = program::instance.get_commands();
+	auto &commands = program::instance.get_commands();
 
 	auto it = commands.find(name);
 	if (it == commands.end()) {
@@ -66,8 +71,8 @@ void help_command::print_commands()
 {
 	std::cout << "Available commands:" << std::endl;
 
-	for (auto& e : program::instance.get_commands()) {
-		auto& cmd = e.second.get();
+	for (auto &e : program::instance.get_commands()) {
+		auto &cmd = e.second.get();
 		auto usage = program::instance.get_usage_text(cmd.name(), cmd.argument_description(), false);
 
 		std::cout << boost::format("%-40s %s") % usage % cmd.description() << std::endl;
