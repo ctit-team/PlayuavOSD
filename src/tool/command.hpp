@@ -12,12 +12,14 @@ public:
 
 	command &operator=(command const &) = delete;
 
+	// command properties
 	virtual char const *name() const = 0;
 	virtual std::vector<argument_descriptor const> const &arguments() const = 0;
 	std::string argument_description() const;
 	virtual char const *description() const = 0;
+	virtual char const *help_text() const = 0;
 
-	virtual void show_help() const;
+	void show_help() const;
 
 	virtual bool execute(std::vector<std::string> const &args) = 0;
 protected:

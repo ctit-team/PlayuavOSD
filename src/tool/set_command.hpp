@@ -1,11 +1,11 @@
-#ifndef EXIT_COMMAND_HPP_INCLUDED
-#define EXIT_COMMAND_HPP_INCLUDED
+#ifndef SET_COMMAND_HPP_INCLUDED
+#define SET_COMMAND_HPP_INCLUDED
 
 #include "command.hpp"
 
-class exit_command final : public command {
+class set_command final : public command {
 public:
-	static exit_command instance;
+	static set_command instance;
 
 	char const *name() const override;
 	std::vector<argument_descriptor const> const &arguments() const override;
@@ -14,8 +14,8 @@ public:
 
 	bool execute(std::vector<std::string> const &args) override;
 private:
-	exit_command();
-	~exit_command();
+	set_command();
+	~set_command();
 };
 
-#endif // EXIT_COMMAND_HPP_INCLUDED
+#endif // SET_COMMAND_HPP_INCLUDED

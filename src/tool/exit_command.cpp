@@ -27,16 +27,12 @@ bool exit_command::execute(std::vector<std::string> const &args)
 	return false;
 }
 
+char const *exit_command::help_text() const
+{
+	return "Exit the program.";
+}
+
 char const *exit_command::name() const
 {
 	return "exit";
-}
-
-void exit_command::show_help() const
-{
-	command::show_help();
-
-	std::cout << std::endl
-			  << "Exit the program."
-			  << std::endl;
 }

@@ -6,6 +6,7 @@ SRC=command.cpp \
 	exit_command.cpp \
 	help_command.cpp \
 	program.cpp \
+	set_command.cpp \
 	variable.cpp
 
 all: $(EXE)

@@ -32,20 +32,23 @@ char const *help_command::description() const
 
 bool help_command::execute(std::vector<std::string> const &args)
 {
-	switch (args.size()) {
-	case 0:
-		print_commands();
-		break;
-	case 1:
-		if (!print_command_help(args[0])) {
-			throw std::runtime_error(boost::str(boost::format("help for command '%s' does not exists") % args[0]));
+	if (args.size()) {
+		auto &cmd = args[0];
+
+		if (!print_command_help(cmd)) {
+			throw std::runtime_error(boost::str(boost::format("help for command '%s' does not exists") % cmd));
 		}
-		break;
-	default:
-		throw std::runtime_error("invalid command's arguments");
+	} else {
+		print_commands();
 	}
 
 	return true;
+}
+
+char const *help_command::help_text() const
+{
+	return "Print the instruction message for a specified COMMAND.\n"
+		   "If COMMAND is omitted, print the summary of all available commands.";
 }
 
 char const *help_command::name() const
@@ -77,13 +80,4 @@ void help_command::print_commands()
 
 		std::cout << boost::format("%-40s %s") % usage % cmd.description() << std::endl;
 	}
-}
-
-void help_command::show_help() const
-{
-	command::show_help();
-
-	std::cout << std::endl
-			  << "Print the instruction message for a specified COMMAND." << std::endl
-			  << "If COMMAND is omitted, print the summary of all available commands." << std::endl;
 }

@@ -12,8 +12,7 @@ public:
 	char const *name() const override;
 	std::vector<argument_descriptor const> const &arguments() const override;
 	char const *description() const override;
-
-	void show_help() const override;
+	char const *help_text() const override;
 
 	bool execute(std::vector<std::string> const &args) override;
 private:

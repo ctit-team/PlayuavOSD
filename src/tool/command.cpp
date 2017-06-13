@@ -35,5 +35,7 @@ std::string command::argument_description() const
 
 void command::show_help() const
 {
-	std::cout << "Usage: " << program::instance.get_usage_text(name(), argument_description()) << std::endl;
+	std::cout << "Usage: " << program::instance.get_usage_text(name(), argument_description()) << std::endl
+			  << std::endl
+			  << help_text() << std::endl;
 }

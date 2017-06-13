@@ -2,6 +2,7 @@
 
 #include "exit_command.hpp"
 #include "help_command.hpp"
+#include "set_command.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -82,7 +83,8 @@ void program::initialize_command_table()
 {
 	commands.insert({
 		{ exit_command::instance.name(), std::ref<command>(exit_command::instance) },
-		{ help_command::instance.name(), std::ref<command>(help_command::instance) }
+		{ help_command::instance.name(), std::ref<command>(help_command::instance) },
+		{ set_command::instance.name(), std::ref<command>(set_command::instance) }
 	});
 }
 
