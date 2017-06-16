@@ -2,6 +2,7 @@
 #define PROGRAM_HPP_INCLUDED
 
 #include "command.hpp"
+#include "command_argument.hpp"
 #include "variable.hpp"
 
 #include <functional>
@@ -12,12 +13,16 @@ typedef std::unordered_map<std::string, std::reference_wrapper<command>> command
 
 class program final {
 public:
+	// fields
 	static program instance;
 
+	// constructors/destructors
 	program(program const &) = delete;
 
+	// operators
 	program &operator=(program const &) = delete;
 
+	// methods
 	command_table const &get_commands() const;
 	std::string get_usage_text() const;
 	std::string get_usage_text(std::string const &cmd, std::string const &arg_desc) const;
@@ -46,7 +51,7 @@ private:
 	int run_interactive();
 	int run_non_interactive(int argc, char *argv[]);
 	command_result execute_command(std::string const &name, std::vector<std::string> const &args);
-	std::vector<std::string> transform_command_arguments(command const &cmd, std::vector<std::string> const &args);
+	std::vector<command_argument> transform_command_arguments(command const &cmd, std::vector<std::string> const &args);
 };
 
 #endif // PROGRAM_HPP_INCLUDED

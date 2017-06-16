@@ -22,7 +22,7 @@ char const *exit_command::description() const
 	return "exit the program";
 }
 
-bool exit_command::execute(std::vector<std::string> const &args)
+bool exit_command::execute(std::vector<command_argument> const &args)
 {
 	return false;
 }

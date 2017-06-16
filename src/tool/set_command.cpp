@@ -41,13 +41,21 @@ char const *set_command::name() const
 	return "set";
 }
 
-bool set_command::execute(std::vector<std::string> const &args)
+bool set_command::execute(std::vector<command_argument> const &args)
 {
-	auto &name = args[0];
-	auto &value = args[1];
+	auto name = args[0].get<std::string>();
+	auto value = args[1].get<std::string>();
 
-	if (!vars::all.count(name)) {
+	// load variable's properties
+	auto it = variables_props.find(name);
+	if (it == variables_props.end()) {
 		throw std::runtime_error(boost::str(boost::format("the variable '%s' does not exists") % name));
+	}
+	auto &props = it->second;
+
+	// set value
+	if (props.test_deserialize) {
+		props.test_deserialize(value);
 	}
 
 	variables_value[name] = value;

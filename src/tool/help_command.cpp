@@ -30,10 +30,10 @@ char const *help_command::description() const
 	return "show help message for the command(s)";
 }
 
-bool help_command::execute(std::vector<std::string> const &args)
+bool help_command::execute(std::vector<command_argument> const &args)
 {
 	if (args.size()) {
-		auto &cmd = args[0];
+		auto cmd = args[0].get<std::string>();
 
 		if (!print_command_help(cmd)) {
 			throw std::runtime_error(boost::str(boost::format("help for command '%s' does not exists") % cmd));

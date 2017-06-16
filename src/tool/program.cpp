@@ -2,7 +2,9 @@
 
 #include "exit_command.hpp"
 #include "help_command.hpp"
+#include "info_command.hpp"
 #include "set_command.hpp"
+#include "string.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -46,7 +48,7 @@ program::command_result program::execute_command(std::string const &name, std::v
 		// execute
 		return cmd.execute(transform_command_arguments(cmd, args)) ? command_result::success : command_result::stop_program;
 	} catch (std::exception &e) {
-		std::cerr << "failed to execute '" << name << "' command: " << e.what() << std::endl;
+		std::cerr << "failed to execute '" << name << "' command: " << to_string(e) << std::endl;
 		return command_result::error;
 	}
 }
@@ -84,6 +86,7 @@ void program::initialize_command_table()
 	commands.insert({
 		{ exit_command::instance.name(), std::ref<command>(exit_command::instance) },
 		{ help_command::instance.name(), std::ref<command>(help_command::instance) },
+		{ info_command::instance.name(), std::ref<command>(info_command::instance) },
 		{ set_command::instance.name(), std::ref<command>(set_command::instance) }
 	});
 }
@@ -174,12 +177,12 @@ int program::run_non_interactive(int argc, char *argv[])
 	}
 }
 
-std::vector<std::string> program::transform_command_arguments(command const &cmd, std::vector<std::string> const &args)
+std::vector<command_argument> program::transform_command_arguments(command const &cmd, std::vector<std::string> const &args)
 {
 	// transfer arguments
 	auto current_arg = args.begin();
 	auto opt_phase = false;
-	std::vector<std::string> result;
+	std::vector<command_argument> result;
 
 	for (auto &desc : cmd.arguments()) {
 		// check argument's order
@@ -199,14 +202,14 @@ std::vector<std::string> program::transform_command_arguments(command const &cmd
 				throw std::logic_error(boost::str(msg));
 			}
 
-			if (!vars::all.count(desc.name)) {
+			if (!variables_props.count(desc.name)) {
 				auto msg = boost::format("the argument '%s' for the command '%s' is not a valid variable") % desc.name % cmd.name();
 				throw std::logic_error(boost::str(msg));
 			}
 
 			auto it = variables_value.find(desc.name);
 			if (it != variables_value.end()) {
-				result.push_back(it->second);
+				result.push_back(command_argument(desc.name, it->second));
 				continue;
 			}
 		}
@@ -217,7 +220,7 @@ std::vector<std::string> program::transform_command_arguments(command const &cmd
 			throw std::runtime_error("insufficient arguments");
 		}
 
-		result.push_back(*current_arg);
+		result.push_back(command_argument(desc.name, *current_arg));
 		current_arg++;
 	}
 

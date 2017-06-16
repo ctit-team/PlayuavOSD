@@ -2,6 +2,7 @@
 #define COMMAND_HPP_INCLUDED
 
 #include "argument_descriptor.hpp"
+#include "command_argument.hpp"
 
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ public:
 
 	void show_help() const;
 
-	virtual bool execute(std::vector<std::string> const &args) = 0;
+	virtual bool execute(std::vector<command_argument> const &args) = 0;
 protected:
 	static std::vector<argument_descriptor const> noarg;
 

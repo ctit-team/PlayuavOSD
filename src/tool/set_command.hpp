@@ -12,7 +12,7 @@ public:
 	char const *description() const override;
 	char const *help_text() const override;
 
-	bool execute(std::vector<std::string> const &args) override;
+	bool execute(std::vector<command_argument> const &args) override;
 private:
 	set_command();
 	~set_command();
