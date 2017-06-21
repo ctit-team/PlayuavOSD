@@ -9,10 +9,12 @@ enum class device_type {
 	osd_board
 };
 
-struct device_properties final {
+struct device_properties {
 	std::string name;
 	device_type type;
 };
+
+std::string to_string(device_type t);
 
 #include "device_properties.inl"
 

@@ -9,7 +9,7 @@ public:
 
 	std::string const &name() const;
 	template<class Value>
-	Value get() const;
+	Value as() const;
 private:
 	std::string n;
 	std::string v;

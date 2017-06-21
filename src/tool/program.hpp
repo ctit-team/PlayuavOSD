@@ -6,10 +6,10 @@
 #include "variable.hpp"
 
 #include <functional>
+#include <map>
 #include <string>
-#include <unordered_map>
 
-typedef std::unordered_map<std::string, std::reference_wrapper<command>> command_table;
+typedef std::map<std::string, std::reference_wrapper<command>> command_table;
 
 class program final {
 public:
@@ -23,7 +23,7 @@ public:
 	program &operator=(program const &) = delete;
 
 	// methods
-	command_table const &get_commands() const;
+	command_table const &commands() const { return cmds; }
 	std::string get_usage_text() const;
 	std::string get_usage_text(std::string const &cmd, std::string const &arg_desc) const;
 	std::string get_usage_text(std::string const &cmd, std::string const &arg_desc, bool prog_name) const;
@@ -41,7 +41,7 @@ private:
 	std::string name;
 	bool running;
 	bool interactive;
-	command_table commands;
+	command_table cmds;
 
 	program();
 	~program();

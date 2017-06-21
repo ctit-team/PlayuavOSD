@@ -14,11 +14,11 @@ public:
 
 	serial_connection &operator=(serial_connection const &) = delete;
 
-	void open(std::string const &dev);
+	void open(std::string const &dev, speed_t spd = B115200);
 	void open(std::string const &name, int flags, mode_t mode = default_mode) override;
 	void close() override;
 
-	void set_speed(speed_t value);
+	void set_attributes(speed_t spd);
 protected:
 	termios attr;
 private:

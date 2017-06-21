@@ -17,7 +17,12 @@ public:
 
 	file_system &operator=(file_system const &) = delete;
 
+	std::string const &name() const;
+
 	virtual void open(std::string const &name, int flags, mode_t mode = default_mode);
+	void close() override;
+private:
+	std::string n;
 };
 
 #endif // FILE_SYSTEM_HPP_INCLUDED

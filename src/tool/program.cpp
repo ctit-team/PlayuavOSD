@@ -1,6 +1,7 @@
 #include "program.hpp"
 
 #include "exit_command.hpp"
+#include "flash_command.hpp"
 #include "help_command.hpp"
 #include "info_command.hpp"
 #include "set_command.hpp"
@@ -38,8 +39,8 @@ program::command_result program::execute_command(std::string const &name, std::v
 {
 	try {
 		// locate the command to execute
-		auto it = commands.find(name);
-		if (it == commands.end()) {
+		auto it = cmds.find(name);
+		if (it == cmds.end()) {
 			throw std::runtime_error("command does not exists");
 		}
 
@@ -51,11 +52,6 @@ program::command_result program::execute_command(std::string const &name, std::v
 		std::cerr << "failed to execute '" << name << "' command: " << to_string(e) << std::endl;
 		return command_result::error;
 	}
-}
-
-command_table const &program::get_commands() const
-{
-	return commands;
 }
 
 std::string program::get_usage_text() const
@@ -83,8 +79,9 @@ std::string program::get_usage_text(std::string const &cmd, std::string const &a
 
 void program::initialize_command_table()
 {
-	commands.insert({
+	cmds.insert({
 		{ exit_command::instance.name(), std::ref<command>(exit_command::instance) },
+		{ flash_command::instance.name(), std::ref<command>(flash_command::instance) },
 		{ help_command::instance.name(), std::ref<command>(help_command::instance) },
 		{ info_command::instance.name(), std::ref<command>(info_command::instance) },
 		{ set_command::instance.name(), std::ref<command>(set_command::instance) }

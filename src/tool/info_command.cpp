@@ -34,14 +34,14 @@ std::vector<argument_descriptor const> const &info_command::arguments() const
 	return args_desc;
 }
 
-char const * info_command::description() const
+std::string info_command::description() const
 {
 	return "get device's details";
 }
 
 bool info_command::execute(std::vector<command_argument> const &args)
 {
-	auto dev = args[0].get<device_properties>();
+	auto dev = args[0].as<device_properties>();
 
 	switch (dev.type) {
 	case device_type::osd_board:
@@ -61,12 +61,12 @@ std::uint8_t info_command::get_osd_firmware_revision(osd_connection &con)
 
 	std::uint8_t rev;
 	con.read(&rev, sizeof(rev));
-	con.synchronize();
+	con.check_command_status();
 
 	return rev;
 }
 
-char const *info_command::help_text() const
+std::string info_command::help_text() const
 {
 	return "Get the specified device's details.";
 }

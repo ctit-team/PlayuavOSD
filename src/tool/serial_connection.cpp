@@ -2,6 +2,7 @@
 
 #include <cerrno>
 #include <cstdlib>
+#include <stdexcept>
 #include <system_error>
 #include <utility>
 
@@ -34,13 +35,20 @@ void serial_connection::clear()
 
 void serial_connection::close()
 {
-	file_system::close();
 	clear();
+	file_system::close();
 }
 
-void serial_connection::open(std::string const &dev)
+void serial_connection::open(std::string const &dev, speed_t spd)
 {
 	open(dev, O_RDWR | O_NOCTTY);
+
+	try {
+		set_attributes(spd);
+	} catch (...) {
+		close();
+		std::throw_with_nested(std::runtime_error("failed to set connection attributes"));
+	}
 }
 
 void serial_connection::open(std::string const &name, int flags, mode_t mode)
@@ -57,17 +65,42 @@ void serial_connection::open(std::string const &name, int flags, mode_t mode)
 	}
 }
 
-void serial_connection::set_speed(speed_t value)
+void serial_connection::set_attributes(speed_t spd)
 {
 	if (!valid()) {
 		throw std::logic_error("the connection is closed");
 	}
 
-	if (cfsetospeed(&attr, value) || cfsetispeed(&attr, value)) {
+	// configure attributes
+	auto attr = this->attr;
+
+	if (cfsetospeed(&attr, spd) || cfsetispeed(&attr, spd)) {
 		throw std::system_error(errno, std::system_category());
 	}
 
-	if (tcsetattr(fd, TCSAFLUSH, &attr)) {
+	attr.c_cflag &= ~(CSIZE | PARENB | CSTOPB | CRTSCTS);
+	attr.c_cflag |= CS8 | CLOCAL | CREAD;
+	attr.c_lflag &= ~(ECHO | ECHOE | ECHOK | ECHONL | ICANON | IEXTEN | ISIG);
+
+	attr.c_iflag &= ~(INPCK | PARMRK | ISTRIP | IXON | IXOFF | IXANY | INLCR | ICRNL | BRKINT);
+	attr.c_iflag |= IGNPAR | IGNCR | IGNBRK;
+	attr.c_oflag &= ~OPOST;
+
+	attr.c_cc[VMIN] = 1;
+	attr.c_cc[VTIME] = 5;
+
+	// apply attributes
+	try {
+		if (tcflush(fd, TCIOFLUSH)) {
+			throw std::system_error(errno, std::system_category());
+		}
+	} catch (...) {
+		std::throw_with_nested(std::runtime_error("failed to flush data"));
+	}
+
+	if (tcsetattr(fd, TCSANOW, &attr)) {
 		throw std::system_error(errno, std::system_category());
 	}
+
+	this->attr = attr;
 }

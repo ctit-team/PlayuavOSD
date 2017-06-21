@@ -25,7 +25,7 @@ std::vector<argument_descriptor const> const &help_command::arguments() const
 	return args_desc;
 }
 
-char const *help_command::description() const
+std::string help_command::description() const
 {
 	return "show help message for the command(s)";
 }
@@ -33,7 +33,7 @@ char const *help_command::description() const
 bool help_command::execute(std::vector<command_argument> const &args)
 {
 	if (args.size()) {
-		auto cmd = args[0].get<std::string>();
+		auto cmd = args[0].as<std::string>();
 
 		if (!print_command_help(cmd)) {
 			throw std::runtime_error(boost::str(boost::format("help for command '%s' does not exists") % cmd));
@@ -45,7 +45,7 @@ bool help_command::execute(std::vector<command_argument> const &args)
 	return true;
 }
 
-char const *help_command::help_text() const
+std::string help_command::help_text() const
 {
 	return "Print the instruction message for a specified COMMAND.\n"
 		   "If COMMAND is omitted, print the summary of all available commands.";
@@ -58,7 +58,7 @@ char const *help_command::name() const
 
 bool help_command::print_command_help(std::string const &name)
 {
-	auto &commands = program::instance.get_commands();
+	auto &commands = program::instance.commands();
 
 	auto it = commands.find(name);
 	if (it == commands.end()) {
@@ -74,7 +74,7 @@ void help_command::print_commands()
 {
 	std::cout << "Available commands:" << std::endl;
 
-	for (auto &e : program::instance.get_commands()) {
+	for (auto &e : program::instance.commands()) {
 		auto &cmd = e.second.get();
 		auto usage = program::instance.get_usage_text(cmd.name(), cmd.argument_description(), false);
 

@@ -1,7 +1,7 @@
 #include <boost/format.hpp>
 
 template<class Value>
-inline Value command_argument::get() const
+inline Value command_argument::as() const
 {
 	command_argument_converter<Value> c;
 

@@ -12,8 +12,8 @@ public:
 
 	char const *name() const override;
 	std::vector<argument_descriptor const> const &arguments() const override;
-	char const *description() const override;
-	char const *help_text() const override;
+	std::string description() const override;
+	std::string help_text() const override;
 
 	bool execute(std::vector<command_argument> const &args) override;
 private:

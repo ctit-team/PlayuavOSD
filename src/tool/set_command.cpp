@@ -26,25 +26,15 @@ std::vector<argument_descriptor const> const &set_command::arguments() const
 	return args_desc;
 }
 
-char const *set_command::description() const
+std::string set_command::description() const
 {
 	return "set the variable value";
 }
 
-char const *set_command::help_text() const
-{
-	return "Assign the value to the variable.";
-}
-
-char const *set_command::name() const
-{
-	return "set";
-}
-
 bool set_command::execute(std::vector<command_argument> const &args)
 {
-	auto name = args[0].get<std::string>();
-	auto value = args[1].get<std::string>();
+	auto name = args[0].as<std::string>();
+	auto value = args[1].as<std::string>();
 
 	// load variable's properties
 	auto it = variables_props.find(name);
@@ -61,4 +51,14 @@ bool set_command::execute(std::vector<command_argument> const &args)
 	variables_value[name] = value;
 
 	return true;
+}
+
+std::string set_command::help_text() const
+{
+	return "Assign the value to the variable.";
+}
+
+char const *set_command::name() const
+{
+	return "set";
 }

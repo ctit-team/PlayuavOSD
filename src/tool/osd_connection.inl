@@ -11,5 +11,6 @@ inline osd_connection &osd_connection::operator>>(Response &resp)
 		d.feed(data);
 	}
 
-	synchronize(); return *this;
+	check_command_status();
+	return *this;
 }

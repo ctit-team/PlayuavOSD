@@ -17,8 +17,8 @@ public:
 	virtual char const *name() const = 0;
 	virtual std::vector<argument_descriptor const> const &arguments() const = 0;
 	std::string argument_description() const;
-	virtual char const *description() const = 0;
-	virtual char const *help_text() const = 0;
+	virtual std::string description() const = 0;
+	virtual std::string help_text() const = 0;
 
 	void show_help() const;
 

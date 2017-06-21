@@ -11,7 +11,7 @@ public:
 	virtual osd_command &operator=(osd_command const &rhs);
 
 	virtual std::uint8_t id() const = 0;
-	virtual std::vector<std::uint8_t> build_payload() const = 0;
+	virtual std::vector<std::uint8_t> build_payload() const;
 protected:
 	osd_command();
 	osd_command(osd_command const &rhs);
