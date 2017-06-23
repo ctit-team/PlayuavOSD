@@ -1,32 +1,24 @@
-EXECUTABLE=PlayuavOSD.elf
-TARGETBIN=PlayuavOSD.bin
-TARGETHEX=PlayuavOSD.hex
+EXE=firmware.elf
+BIN=firmware.bin
+HEX=firmware.hex
 
 CC=arm-none-eabi-gcc
 AS=arm-none-eabi-as
 CP=arm-none-eabi-objcopy
 
-#config customize compiler tool
-#TOOLCHAIN_PATH = /opt/gcc-arm-none-eabi-4_7-2013q2/bin
-#CC=$(TOOLCHAIN_PATH)/arm-none-eabi-gcc
-#AS=$(TOOLCHAIN_PATH)/arm-none-eabi-as
-#CP=$(TOOLCHAIN_PATH)/arm-none-eabi-objcopy
-
-BIN  = $(CP) -O binary -S
 DEFS = -DUSE_STDPERIPH_DRIVER -DSTM32F4XX -DHSE_VALUE=8000000
 
 MCU = cortex-m4
 MCFLAGS = -mcpu=$(MCU) -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -std=gnu99
-STMLIBSDIR    = ./lib/STM32F4-Discovery_FW_V1.1.0/Libraries
+STMLIBSDIR    = ../../lib/STM32F4-Discovery_FW_V1.1.0/Libraries
 STMSPDDIR    = $(STMLIBSDIR)/STM32F4xx_StdPeriph_Driver
 STMSPSRCDDIR = $(STMSPDDIR)/src
 STMSPINCDDIR = $(STMSPDDIR)/inc
-#FREERTOSDIR = ./lib/FreeRTOS8.1.2/Source
-FREERTOSDIR = ./lib/FreeRTOSV8.2.0/FreeRTOS/Source
+FREERTOSDIR = ../../lib/FreeRTOSV8.2.0/FreeRTOS/Source
 USBOTGLIB = $(STMLIBSDIR)/STM32_USB_OTG_Driver
 USBDEVICELIB = $(STMLIBSDIR)/STM32_USB_Device_Library
 USBHOSTLIB = $(STMLIBSDIR)/STM32_USB_HOST_Library
-MAVLINKDIR = ./lib/mavlink/v1.0
+MAVLINKDIR = ../../lib/mavlink/v1.0
 
 STM32_INCLUDES = -I$(STMLIBSDIR)/CMSIS/Include/ \
 				 -I$(STMLIBSDIR)/CMSIS/ST/STM32F4xx/Include/ \
@@ -38,10 +30,10 @@ STM32_INCLUDES = -I$(STMLIBSDIR)/CMSIS/Include/ \
           		 -I$(USBDEVICELIB)/Core/inc    \
           		 -I$(USBHOSTLIB)/Core/inc    \
           		 -I$(USBOTGLIB)/inc    \
-				 -I./inc 
+				 -I../../inc 
 OPTIMIZE       = -Os
 
-CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I./ -I./ $(STM32_INCLUDES)  -Wl,-T,./linker/stm32_flash.ld
+CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I../../ $(STM32_INCLUDES)  -Wl,-T,../../linker/stm32_flash.ld
 AFLAGS	= $(MCFLAGS) 
 #-mapcs-float use float regs. small increase in code size
 
@@ -55,33 +47,33 @@ STM32_USB_DEVICE_SRC =	$(USBDEVICELIB)/Class/cdc/src/usbd_cdc_core.c \
 						$(USBDEVICELIB)/Core/src/usbd_ioreq.c
 
 ## list of APP files
-SRC  = ./src/main.c
-SRC += ./src/system_stm32f4xx.c
-SRC += ./src/stm32f4xx_it.c
-SRC += ./src/board.c
-SRC += ./src/led.c
-SRC += ./src/spi.c
-SRC += ./src/usart2.c
-SRC += ./src/osdvar.c
-SRC += ./src/font_outlined8x8.c
-SRC += ./src/font_outlined8x14.c
-SRC += ./src/fonts.c
-SRC += ./src/graphengine.c
-SRC += ./src/m2dlib.c
-SRC += ./src/m3dlib.c
-SRC += ./src/math3d.c
-SRC += ./src/max7456.c
-SRC += ./src/osdconfig.c
-SRC += ./src/osdcore.c
-SRC += ./src/osdmavlink.c
-SRC += ./src/osdproc.c
-SRC += ./src/UAVObj.c
-SRC += ./src/uavtalk.c
-SRC += ./src/usb_bsp.c
-SRC += ./src/usbd_cdc_vcp.c
-SRC += ./src/usbd_desc.c
-SRC += ./src/usbd_usr.c
-SRC += ./src/printf2.c
+SRC  = main.c
+SRC += system_stm32f4xx.c
+SRC += stm32f4xx_it.c
+SRC += board.c
+SRC += led.c
+SRC += spi.c
+SRC += usart2.c
+SRC += osdvar.c
+SRC += font_outlined8x8.c
+SRC += font_outlined8x14.c
+SRC += fonts.c
+SRC += graphengine.c
+SRC += m2dlib.c
+SRC += m3dlib.c
+SRC += math3d.c
+SRC += max7456.c
+SRC += osdconfig.c
+SRC += osdcore.c
+SRC += osdmavlink.c
+SRC += osdproc.c
+SRC += UAVObj.c
+SRC += uavtalk.c
+SRC += usb_bsp.c
+SRC += usbd_cdc_vcp.c
+SRC += usbd_desc.c
+SRC += usbd_usr.c
+SRC += printf2.c
 ## used parts of the STM-Library
 SRC += $(STMSPSRCDDIR)/stm32f4xx_dma.c
 SRC += $(STMSPSRCDDIR)/stm32f4xx_exti.c
@@ -109,23 +101,18 @@ SRC += $(FREERTOSDIR)/timers.c
 SRC += $(STM32_USB_OTG_SRC)
 SRC += $(STM32_USB_DEVICE_SRC)
 # List ASM source files here
-STARTUP = ./$(STMLIBSDIR)/CMSIS/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f40xx.s
+STARTUP = $(STMLIBSDIR)/CMSIS/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f40xx.s
 
+all: $(HEX)
 
-all: $(TARGETBIN) objcopy
-
-$(TARGETBIN): $(EXECUTABLE)
-	$(BIN) $^ $@
-	
-$(EXECUTABLE): $(SRC) $(STARTUP)
-	$(CC) $(CFLAGS) $^ -lm -lc -lnosys -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -o $@
-
-objcopy:
-	@python -u px_mkfw.py --image $(TARGETBIN) > $(TARGETHEX)
-	
 clean:
-	rm -f $(TARGETBIN) $(EXECUTABLE) $(TARGETHEX) $(SRC:.c=.lst)
+	rm -f $(HEX) $(BIN) $(EXE) $(SRC:.c=.lst)
 
-upload: $(TARGETBIN) 
-	st-flash write $(TARGETBIN) 0x8004000
+$(HEX): $(BIN)
+	../../tools/px_mkfw.py --board_id 90 --description "Firmware for the PLAYUAVOSD board" --image $^ > $@
 
+$(BIN): $(EXE)
+	$(CP) -O binary -S $^ $@
+	
+$(EXE): $(SRC) $(STARTUP)
+	$(CC) $(CFLAGS) $^ -lm -lc -lnosys -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -o $@
