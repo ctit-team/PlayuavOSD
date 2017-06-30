@@ -1,0 +1,1 @@
+stm32f4/Libraries/CMSIS/ST/STM32F4xx/Source/Templates/gcc_ride7/startup_stm32f40xx.s

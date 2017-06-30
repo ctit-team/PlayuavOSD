@@ -117,9 +117,12 @@ class firmware(object):
     def __init__(self, path):
 
         # read the file
-        f = open(path, "r")
-        self.desc = json.load(f)
-        f.close()
+        if path is None:
+            self.desc = json.load(sys.stdin)
+        else:
+            f = open(path, "r")
+            self.desc = json.load(f)
+            f.close()
 
         self.image = bytearray(zlib.decompress(base64.b64decode(self.desc['image'])))
 
@@ -593,7 +596,7 @@ def main():
     parser.add_argument('--baud-flightstack', action="store", default="57600", help="Comma-separated list of baud rate of the serial port (default is 57600) when communicating with flight stack (Mavlink or NSH), only required for true serial ports.")
     parser.add_argument('--force', action='store_true', default=False, help='Override board type check and continue loading')
     parser.add_argument('--boot-delay', type=int, default=None, help='minimum boot delay to store in flash')
-    parser.add_argument('firmware', action="store", help="Firmware file to be uploaded")
+    parser.add_argument('firmware', action="store", nargs='?', help="Firmware file to be uploaded")
     args = parser.parse_args()
 
     # warn people about ModemManager which interferes badly with Pixhawk

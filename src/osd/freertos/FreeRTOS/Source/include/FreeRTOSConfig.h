@@ -79,7 +79,7 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-#include "stm32f4xx.h"  // JEK -> The "SystemCoreClock comes for here.
+//#include "stm32f4xx.h"  // JEK -> The "SystemCoreClock comes for here.
 
 
 #define configUSE_PREEMPTION			1

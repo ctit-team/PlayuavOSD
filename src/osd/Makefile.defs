@@ -1,0 +1,15 @@
+# tools
+AR = arm-none-eabi-ar
+AS = arm-none-eabi-as
+CC = arm-none-eabi-gcc
+CP = arm-none-eabi-objcopy
+LD = arm-none-eabi-gcc
+
+# tool's options
+ASFLAGS = $(GFLAGS)
+CDEFS = -D "USE_STDPERIPH_DRIVER" -D "STM32F4XX" -D "HSE_VALUE=8000000"
+CFLAGS = $(CINCS) $(CDEFS) $(GFLAGS) -Os
+GFLAGS = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+LDLIBS = -lnosys
+LDFLAGS = $(LDPATH) $(GFLAGS)
+LDPATH =
